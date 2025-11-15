@@ -1,1 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dragon Base Raid – Simple Simulation</title>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    #log { border: 1px solid #ccc; padding: 10px; height: 250px; overflow-y: auto; background: #f9f9f9; }
+    button { padding: 8px 12px; margin-bottom: 10px; }
+    .small { font-size: 12px; color: #555; }
+  </style>
+</head>
+<body>
+  <h1>🐉⚔️ Dragon Base Raid – Simulation</h1>
+  <p>Click the button to watch a random round of Dragon Base Raid play out.</p>
+  <button onclick="runSimulation()">Run Simulation</button>
+  <div id="log"></div>
+  <p class="small">This is not the Roblox game, just a simple text simulation that shows what could happen in one round.</p>
+
+<script>
+function log(msg) {
+  const div = document.getElementById("log");
+  div.innerHTML += msg + "<br>";
+  div.scrollTop = div.scrollHeight;
+}
+
+function runSimulation() {
+  const logDiv = document.getElementById("log");
+  logDiv.innerHTML = "";
+
+  log("New Round Started!<br>");
+
+  let team1Raider = { name: "Team1 Raider", position: 0, hasEgg: false };
+  let team2Raider = { name: "Team2 Raider", position: 100, hasEgg: false };
+
+  let egg1 = { team: 1, atBase: true };
+  let egg2 = { team: 2, atBase: true };
+
+  let steps = 0;
+  let maxSteps = 40;
+  let winner = null;
+
+  log("Team1 base at position 0 with Egg1.");
+  log("Team2 base at position 100 with Egg2.");
+  log("Both raiders run toward the enemy base!<br>");
+
+  while (steps < maxSteps && !winner) {
+    steps++;
+
+    // Move Team1 raider toward Team2 base
+    if (team1Raider.position < 100) team1Raider.position += 5;
+
+    // Move Team2 raider toward Team1 base
+    if (team2Raider.position > 0) team2Raider.position -= 5;
+
+    // Chance for mid-field tag
+    if (Math.abs(team1Raider.position - team2Raider.position) < 5) {
+      const whoTags = Math.random() < 0.5 ? "Team1" : "Team2";
+      if (whoTags === "Team1") {
+        log("Team1 Raider tags Team2 Raider in the middle! Team2 Raider must restart.");
+        team2Raider.position = 100;
+        team2Raider.hasEgg = false;
+      } else {
+        log("Team2 Raider tags Team1 Raider in the middle! Team1 Raider must restart.");
+        team1Raider.position = 0;
+        team1Raider.hasEgg = false;
+      }
+    }
+
+    // Team1 raider reaches Team2 base
+    if (!team1Raider.hasEgg && team1Raider.position >= 100 && egg2.atBase) {
+      log("Team1 Raider reaches Team2 base and steals Egg2! 🥚");
+      team1Raider.hasEgg = true;
+      egg2.atBase = false;
+    }
+
+    // Team2 raider reaches Team1 base
+    if (!team2Raider.hasEgg && team2Raider.position <= 0 && egg1.atBase) {
+      log("Team2 Raider reaches Team1 base and steals Egg1! 🥚");
+      team2Raider.hasEgg = true;
+      egg1.atBase = false;
+    }
+
+    // Raiders carrying eggs run back toward their own base
+    if (team1Raider.hasEgg && team1Raider.position > 0) {
+      team1Raider.position -= 5;
+      if (team1Raider.position <= 0) {
+        winner = "Team 1";
+        log("<br>Team1 Raider returns home with Egg2. ✅ TEAM 1 SCORES!");
+      }
+    }
+
+    if (team2Raider.hasEgg && team2Raider.position < 100) {
+      team2Raider.position += 5;
+      if (team2Raider.position >= 100) {
+        winner = "Team 2";
+        log("<br>Team2 Raider returns home with Egg1. ✅ TEAM 2 SCORES!");
+      }
+    }
+  }
+
+  if (!winner) {
+    log("<br>No one scored this round. It's a draw.");
+  }
+
+  log("<br>Round finished.");
+}
+</script>
+</body>
+</html>
 
